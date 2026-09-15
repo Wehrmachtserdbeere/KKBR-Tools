@@ -1,5 +1,6 @@
 from playwright.sync_api import sync_playwright, TimeoutError
 import json
+import re
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -324,7 +325,7 @@ with sync_playwright() as p:
 
         scenario_tagline = page.locator(
             "p.card-tagline"
-        ).inner_text().strip()
+        ).first.inner_text().strip()
 
         # ----------------------------------------
         # Description
@@ -332,7 +333,7 @@ with sync_playwright() as p:
 
         description = page.locator(
             ".description-card .markdown-content"
-        ).inner_html()
+        ).first.inner_html()
 
 
         # ----------------------------------------
@@ -534,10 +535,8 @@ with sync_playwright() as p:
         )
 
 
-        file_name = scenario_name.replace(
-            " ",
-            "_"
-        )
+        file_name = re.sub(r'[<>:"/\\|?*]', "", scenario_name)
+        file_name = re.sub(r"\s+", "_", file_name).strip("_")
 
 
         output_path = SCENARIOS_FOLDER / f"{file_name}.json"
